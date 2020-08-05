@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ckc.core.dao.StaffDao">
+    <!--SQL片段  -->
+    <sql id="selectStaffListWhere">
+        <where>
+	       <if test="staff_name != null" >
+	           staff_name like "%"#{staff_name}"%"
+	       </if>
+	       <if test="staff_department != null" >
+	        and staff_department = #{staff_department}
+	       </if>
+	       <if test="staff_salary != null" >
+	        and staff_salary = #{staff_salary}
+	       </if>
+	       <if test="staff_position != null" >
+	        and staff_position = #{staff_position}
+	       </if>
+        </where>
+    </sql>
+	<!-- 查询客户列表  -->
+	<select id="selectStaffList" parameterType="staff" 
+                                           resultType="staff">
+		SELECT
+			staff_id,
+			staff_name,
+			staff_user_id,
+			staff_create_id,
+			b.dict_item_name staff_department,
+			c.dict_item_name staff_salary,
+			d.dict_item_name staff_position,
+			staff_linkman,
+			staff_phone,
+			staff_mobile,
+			staff_createtime
+		FROM
+			staff a
+		LEFT JOIN (
+			SELECT
+				dict_id,
+				dict_item_name
+			FROM
+				base_dict
+			WHERE
+				dict_type_code = '002'
+		) b ON a.staff_department = b.dict_id
+		LEFT JOIN (
+			SELECT
+				dict_id,
+				dict_item_name
+			FROM
+				base_dict
+			WHERE
+				dict_type_code = '001'
+		) c ON a.staff_salary = c.dict_id
+		LEFT JOIN (
+			SELECT
+				dict_id,
+				dict_item_name
+			FROM
+				base_dict
+			WHERE
+				dict_type_code = '006'
+		) d ON a.staff_position = d.dict_id
+		<include refid="selectStaffListWhere"/>
+		<!-- 执行分页查询 -->
+		<if test="start !=null and rows != null">
+			limit #{start},#{rows}
+		</if>
+	</select>
+	<!-- 查询客户总数 -->
+	<select id="selectStaffListCount" parameterType="staff" 
+                                                 resultType="Integer">
+		select count(*) from staff
+		<include refid="selectStaffListWhere"/>
+	</select>	
+	
+	<!-- 添加客户 -->
+	<insert id="createStaff" parameterType="staff">
+	    insert into staff(
+	                     staff_name,
+	                     staff_user_id,
+	                     staff_create_id,
+	                     staff_department,
+	                     staff_salary,
+	                     staff_position,
+	                     staff_linkman,
+	                     staff_phone,
+	                     staff_mobile,
+	                     staff_zipcode,
+	                     staff_address,
+	                     staff_createtime
+	             )
+	             values(#{staff_name},
+	                    #{staff_user_id},
+	                    #{staff_create_id},
+	                    #{staff_department},
+	                    #{staff_salary},
+	                    #{staff_position},
+	                    #{staff_linkman},
+	                    #{staff_phone},
+	                    #{staff_mobile},
+	                    #{staff_zipcode},
+	                    #{staff_address},
+	                    #{staff_createtime}
+	            )
+	</insert>
+	<!-- 根据id获取客户信息 -->
+	<select id="getStaffById" parameterType="Integer" 
+	resultType="staff">
+	    select * from staff where staff_id = #{id}
+	</select>
+	<!-- 更新客户 -->
+	<update id="updateStaff" parameterType="staff">
+	    update staff
+	    <set>
+	        <if test="staff_name!=null">
+	            staff_name=#{staff_name},
+	        </if>
+	        <if test="staff_user_id!=null">
+	            staff_user_id=#{staff_user_id},
+	        </if>
+	        <if test="staff_create_id!=null">
+	            staff_create_id=#{staff_create_id},
+	        </if>
+	        <if test="staff_department!=null">
+	            staff_department=#{staff_department},
+	        </if>
+	        <if test="staff_salary!=null">
+	            staff_salary=#{staff_salary},
+	        </if>
+	        <if test="staff_position!=null">
+	            staff_position=#{staff_position},
+	        </if>
+	        <if test="staff_linkman!=null">
+	            staff_linkman=#{staff_linkman},
+	        </if>
+	        <if test="staff_phone!=null">
+	            staff_phone=#{staff_phone},
+	        </if>
+	        <if test="staff_mobile!=null">
+	            staff_mobile=#{staff_mobile},
+	        </if>
+	        <if test="staff_zipcode!=null">
+	            staff_zipcode=#{staff_zipcode},
+	        </if>
+	        <if test="staff_address!=null">
+	            staff_address=#{staff_address},
+	        </if>
+	        <if test="staff_createtime!=null">
+	            staff_createtime=#{staff_createtime},
+	        </if>
+	    </set>
+	    where staff_id=#{staff_id}
+	</update>
+	<!-- 删除客户 -->
+	<delete id="deleteStaff" parameterType="Integer">
+	    delete from staff where staff_id=#{id}
+	</delete>
+</mapper>
